@@ -42,11 +42,77 @@
                     android:layout_weight="1"
                     android:text="Имя:"
                     android:textColor="#FFFFFF"
-                    android:textSize="22dp"
+                    android:textSize="19dp"
                     android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/etReg_Name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#FFFFFF"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/regSurname"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView8"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:text="Фамилия:"
+                    android:textColor="#FFFFFF"
+                    android:textSize="19dp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etReg_Surname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#FFFFFF"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/regMiddleName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:text="Отчество:"
+                    android:textColor="#FFFFFF"
+                    android:textSize="19dp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etReg_MiddleName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
@@ -75,7 +141,7 @@
                     android:layout_weight="1"
                     android:text="Пол:"
                     android:textColor="#FFFFFF"
-                    android:textSize="22dp"
+                    android:textSize="19dp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -121,13 +187,13 @@
 
                 <TextView
                     android:id="@+id/textView"
-                    android:layout_width="50dp"
+                    android:layout_width="12dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
                     android:text="Почта:"
                     android:textColor="#FFFFFF"
-                    android:textSize="22dp"
+                    android:textSize="19dp"
                     android:textStyle="bold" />
 
                 <EditText
@@ -140,7 +206,7 @@
                     android:ems="10"
                     android:inputType="textEmailAddress"
                     android:textColor="#FFFFFF"
-                    android:textSize="22dp"
+                    android:textSize="19dp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -160,7 +226,7 @@
                     android:layout_weight="1"
                     android:text="Пароль:"
                     android:textColor="#FFFFFF"
-                    android:textSize="22dp"
+                    android:textSize="19dp"
                     android:textStyle="bold" />
 
                 <EditText
