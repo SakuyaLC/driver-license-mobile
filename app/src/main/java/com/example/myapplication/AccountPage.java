@@ -1,18 +1,25 @@
 package com.example.myapplication;
 
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
 import com.google.zxing.BarcodeFormat;
@@ -20,72 +27,119 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 
-import java.io.IOException;
-import java.util.HashMap;
+import org.bson.Document;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
-import java.util.jar.Attributes;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class AccountPage extends AppCompatActivity {
 
-    protected final String CheckURL = "http://10.0.2.2:8080";
     OkHttpClient client = new OkHttpClient();
 
-    public String id, surname, middlename, birthDatePlace, dateOfIssue, dateOfExpiration, division, code, residence, categories;
+    public String id;
 
-    public String infoForQr;
+    //Водительское удостоверение
+    public String surname, middlename, birthDatePlace, dateOfIssue, dateOfExpiration, division, code, residence, categories;
 
-    public Intent loginIntent = getIntent();
+    //История проверок, штрафов
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_page);
 
-        id = "1"; //loginIntent.getStringExtra("userLoginId");
-        surname = "Сорокин"; //loginIntent.getStringExtra("user_surname");
-        middlename = "Александр Владимирович"; //loginIntent.getStringExtra("user_name") + " " + loginIntent.getStringExtra("user_middleName");
-        birthDatePlace = "21.01.1997 Ростовская облатсь";
-        dateOfIssue = "13.04.2009";
-        dateOfExpiration = "13.04.2019";
-        division = "ГИБДД 6100";
-        code = "61 35 414035";
-        residence = "Саратовская область";
-        categories = "B";
+        Intent loginIntent = getIntent();
+
+        id = loginIntent.getStringExtra("Id");
+
+        findBlockByUserIdAsync(id, new LicenceCallback() {
+            @Override
+            public void onSuccess(Licence licence) {
+
+                surname = licence.surname;
+                middlename = licence.middlename;
+                birthDatePlace = licence.birthDatePlace;
+                dateOfIssue = licence.dateOfIssue;
+                dateOfExpiration = licence.dateOfExpiration;
+                division = licence.division;
+                code = licence.code;
+                residence = licence.residence;
+                categories = licence.categories;
+
+                UpdateInfo();
+
+                Log.d("MongoDB", "Licence is loaded...");
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                // Обработать ошибку
+            }
+        });
 
         UpdateInfo();
+        formQrCode(id);
+
+        Context contex = this;
+        findChecksByUserIdAsync(id, new CheckCallback() {
+            @Override
+            public void onSuccess(ArrayList<Check> checkList) {
+                for (int i = checkList.size() - 1; i >= 0; i--){
+                    createCheckUIOnMainThread(checkList.get(i).dateTime, checkList.get(i).type.toString(), checkList.get(i).description, checkList.get(i).fine, contex);
+                }
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                // Обработать ошибку
+            }
+        });
+
+        openProfile();
 
         Button btn_Profile = findViewById(R.id.btn_Profile);
-        Button btn_Shtraf = findViewById(R.id.btn_Shtraf);
-
-        infoForQr = packInfoForQR();
-        formQrCode(infoForQr);
-
+        Button btn_History = findViewById(R.id.btn_History);
         btn_Profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 UpdateInfo();
-                infoForQr = packInfoForQR();
-
-                formQrCode(infoForQr);
-
-                checkGetResponse();
+                formQrCode(id);
+                openProfile();
             }
         });
 
-        btn_Shtraf.setOnClickListener(new View.OnClickListener() {
+        btn_History.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                findChecksByUserIdAsync(id, new CheckCallback() {
+                    @Override
+                    public void onSuccess(ArrayList<Check> checkList) {
+                        removeAllChecksFromView();
+                        for (int i = checkList.size() - 1; i >= 0; i--){
+                            createCheckUIOnMainThread(checkList.get(i).dateTime, checkList.get(i).type.toString(), checkList.get(i).description, checkList.get(i).fine, contex);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception exception) {
+                        // Обработать ошибку
+                    }
+                });
+
+                openHistory();
             }
         });
     }
@@ -113,55 +167,6 @@ public class AccountPage extends AppCompatActivity {
         }
     }
 
-    public void checkGetResponse(){
-        Request request = new Request.Builder().url(CheckURL).get().build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        String responseString = null;
-                        Toast toast;
-
-                        try {
-                            responseString = response.body().string();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        if (responseString.equals("Success")){
-                            toast = Toast.makeText(getApplicationContext(),
-                                    "Переход в аккаунт...", Toast.LENGTH_SHORT);
-                        }
-                        else{
-                            toast = Toast.makeText(getApplicationContext(),
-                                    responseString + "Нет соединения", Toast.LENGTH_SHORT);
-                        }
-                        toast.show();
-
-                    }
-                });
-            }
-        });
-    }
-
-    public String packInfoForQR(){
-
-        User user = new User(id, surname, middlename, birthDatePlace, dateOfIssue, dateOfExpiration, division, code, residence, categories);
-
-        Gson gson = new Gson();
-        String userJson = gson.toJson(user);
-
-        return userJson;
-    }
-
     public void UpdateInfo(){
         //Поля в профиле пользователя
         TextView tv_UserSurname = findViewById(R.id.tv_UserSurname);
@@ -183,6 +188,304 @@ public class AccountPage extends AppCompatActivity {
         tv_UserCode.setText(code);
         tv_UserRegionOfResidence.setText(residence);
         tv_UserCategories.setText(categories);
+    }
+
+    public void findBlockByUserIdAsync(String id, final LicenceCallback callback) {
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                Licence licence;
+
+                //Подключение к MongoDB
+                MongoClientSettings settings = MongoClientSettings.builder()
+                        .applyToClusterSettings(builder ->
+                                builder.hosts(Arrays.asList(new ServerAddress("10.0.2.2", 27017))))
+                        .build();
+
+                MongoClient mongoClient = MongoClients.create(settings);
+
+                MongoDatabase database = mongoClient.getDatabase("blockchainDB");
+
+                MongoCollection<Document> collection = database.getCollection("blocks");
+                Log.d("MongoDB", "Подключение есть!");
+
+                MongoCursor<Document> cursor = collection.find().iterator();
+                if (cursor.hasNext()) {
+                    cursor.next();
+                    while (cursor.hasNext()) {
+
+                        Document block = cursor.next();
+
+                        String info = block.getString("info");
+
+                        Log.d("MongoDB", "Info is: " + info);
+
+                        Gson gson = new Gson();
+                        Message message = gson.fromJson(info, Message.class);
+
+                        Log.d("MongoDB", "Message type is: " + message.type);
+                        Log.d("MongoDB", "Message content is: " + message.content);
+
+                        if (message.type.toString().equals("LICENCE")) {
+
+                            licence = gson.fromJson(message.content, Licence.class);
+
+                            if (Long.toString(licence.user_id).equals(id)) {
+                                callback.onSuccess(licence);
+                                Log.d("MongoDB", "Licence found! It's id :" + Long.toString(licence.user_id));
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                callback.onError(new Exception("Licence not found for user ID: " + id));
+            }
+        }).start();
+    }
+
+    public interface LicenceCallback {
+        void onSuccess(Licence licence);
+        void onError(Exception exception);
+    }
+
+    public void openProfile(){
+
+        ((Button) findViewById(R.id.btn_Profile)).setBackgroundColor(Color.parseColor("#40C4FF"));
+        ((Button) findViewById(R.id.btn_History)).setBackgroundColor(Color.parseColor("#FFFFFF"));
+
+        ((ScrollView) findViewById(R.id.sv_profile)).setVisibility(View.VISIBLE);
+        ((ScrollView) findViewById(R.id.sv_history)).setVisibility(View.GONE);
+    }
+
+    public void openHistory(){
+        ((Button) findViewById(R.id.btn_Profile)).setBackgroundColor(Color.parseColor("#FFFFFF"));
+        ((Button) findViewById(R.id.btn_History)).setBackgroundColor(Color.parseColor("#40C4FF"));
+
+        ((ScrollView) findViewById(R.id.sv_profile)).setVisibility(View.GONE);
+        ((ScrollView) findViewById(R.id.sv_history)).setVisibility(View.VISIBLE);
+    }
+
+    public void createCheckUI(String time, String type, String description, double fine, Context context){
+
+        // Linear Layout body
+        LinearLayout ll_body = new LinearLayout(context);
+        ll_body.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams layoutParamsBody = new LinearLayout.LayoutParams(
+        (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 350, getResources().getDisplayMetrics()),
+                (int) TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, type.equals("FINE") ? 100 : 70, getResources().getDisplayMetrics()));
+        layoutParamsBody.setMargins(0, (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 10, getResources().getDisplayMetrics()), 0, 0);
+        layoutParamsBody.gravity = Gravity.CENTER_VERTICAL;
+        ll_body.setLayoutParams(layoutParamsBody);
+        ll_body.setBackgroundResource(R.drawable.check_border);
+
+        // Linear Layout time
+        LinearLayout ll_time = new LinearLayout(context);
+        ll_time.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams layoutParamsTime = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                (int) TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, 40, getResources().getDisplayMetrics()),
+                1f);
+        ll_time.setLayoutParams(layoutParamsTime);
+
+        // Linear Layout description
+        LinearLayout ll_description = new LinearLayout(context);
+        ll_description.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams layoutParamsDescription = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                1f);
+        ll_description.setLayoutParams(layoutParamsDescription);
+
+        //Linear Layout подписи описания
+        LinearLayout ll_descriptionLabels = new LinearLayout(context);
+        ll_descriptionLabels.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams layoutParamsDescriptionLabels = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        ll_descriptionLabels.setLayoutParams(layoutParamsDescriptionLabels);
+
+        //Linear Layout подписи значения
+        LinearLayout ll_descriptionValues = new LinearLayout(context);
+        ll_descriptionValues.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams layoutParamsDescriptionValues = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        layoutParamsDescriptionValues.gravity = Gravity.RIGHT;
+        ll_descriptionValues.setLayoutParams(layoutParamsDescriptionValues);
+        ll_descriptionValues.setPadding(0, 0, (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics()), 0);
+
+
+        //Тип, описание и размер штрафа (Подписи)
+        TextView label_type = new TextView(context);
+        label_type.setText("Тип: ");
+        LinearLayout.LayoutParams layoutParamsLabelType = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParamsLabelType.setMargins((int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics()), (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()), 0, 0);
+        label_type.setLayoutParams(layoutParamsLabelType);
+        label_type.setTextColor(Color.parseColor("#151515"));
+        label_type.setTypeface(null, Typeface.BOLD);
+
+        TextView label_description = new TextView(context);
+        label_description.setText("Описание: ");
+        label_description.setLayoutParams(layoutParamsLabelType);
+        label_description.setTextColor(Color.parseColor("#151515"));
+        label_description.setTypeface(null, Typeface.BOLD);
+
+        TextView label_fine = new TextView(context);
+        label_fine.setText("Размер: ");
+        label_fine.setLayoutParams(layoutParamsLabelType);
+        label_fine.setTextColor(Color.parseColor("#151515"));
+        label_fine.setTypeface(null, Typeface.BOLD);
+
+        //Время (Значения)
+        TextView tv_time = new TextView(context);
+        tv_time.setText(time);
+        tv_time.setLayoutParams(layoutParamsLabelType);
+        tv_time.setTextColor(Color.parseColor("#151515"));
+        tv_time.setTypeface(null, Typeface.BOLD);
+
+        //Тип, описание и размер штрафа (Значения)
+        TextView tv_type = new TextView(context);
+        tv_type.setText(type.equals("CHECK") ? "Проверка": "Штраф");
+        LinearLayout.LayoutParams layoutParamsValueType = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParamsValueType.setMargins((int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics()), (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics()), 0, 0);
+        tv_type.setLayoutParams(layoutParamsValueType);
+        tv_type.setTextColor(Color.parseColor("#151515"));
+        tv_type.setTypeface(null, Typeface.BOLD);
+
+        TextView tv_description = new TextView(context);
+        tv_description.setText(description);
+        tv_description.setLayoutParams(layoutParamsLabelType);
+        tv_description.setTextColor(Color.parseColor("#151515"));
+        tv_description.setTypeface(null, Typeface.BOLD);
+
+        TextView tv_fine = new TextView(context);
+        if (type.equals("FINE")){
+            tv_fine.setText(Double.toString(fine) + " рублей");
+        } else {
+            label_fine.setVisibility(View.GONE);
+            tv_fine.setVisibility(View.GONE);
+        }
+        tv_fine.setLayoutParams(layoutParamsLabelType);
+        tv_fine.setTextColor(Color.parseColor("#151515"));
+        tv_fine.setTypeface(null, Typeface.BOLD);
+
+        //Вставка времени в layout времени
+        ll_time.addView(tv_time);
+
+        //Вставка значений в layout подписей
+        ll_descriptionLabels.addView(label_type);
+        ll_descriptionLabels.addView(label_description);
+        ll_descriptionLabels.addView(label_fine);
+
+        //Вставка значений в layout значений
+        ll_descriptionValues.addView(tv_type);
+        ll_descriptionValues.addView(tv_description);
+        ll_descriptionValues.addView(tv_fine);
+
+        //Вставка layout'ов в layout horizontal для описания
+        ll_description.addView(ll_descriptionLabels);
+        ll_description.addView(ll_descriptionValues);
+
+        //Вставка всех layout'ов в соответствующий держатель
+        ll_body.addView(ll_time);
+        ll_body.addView(ll_description);
+
+        //Вставка держателя в scroll view истории
+        LinearLayout scrollView = (LinearLayout) findViewById(R.id.svH_body);
+        scrollView.addView(ll_body);
+    }
+
+    public void findChecksByUserIdAsync(String id, final CheckCallback callback) {
+
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                ArrayList<Check> checkList = new ArrayList<>();
+                Check check;
+
+                //Подключение к MongoDB
+                MongoClientSettings settings = MongoClientSettings.builder()
+                        .applyToClusterSettings(builder ->
+                                builder.hosts(Arrays.asList(new ServerAddress("10.0.2.2", 27017))))
+                        .build();
+
+                MongoClient mongoClient = MongoClients.create(settings);
+
+                MongoDatabase database = mongoClient.getDatabase("blockchainDB");
+
+                MongoCollection<Document> collection = database.getCollection("blocks");
+
+                MongoCursor<Document> cursor = collection.find().iterator();
+                if (cursor.hasNext()) {
+                    cursor.next();
+                    while (cursor.hasNext()) {
+
+                        Document block = cursor.next();
+
+                        String info = block.getString("info");
+
+                        Log.d("MongoDB", "Info is: " + info);
+
+                        Gson gson = new Gson();
+                        Message message = gson.fromJson(info, Message.class);
+
+                        Log.d("MongoDB", "Message type is: " + message.type);
+                        Log.d("MongoDB", "Message content is: " + message.content);
+
+                        if (message.type.toString().equals("CHECK")) {
+
+                            check = gson.fromJson(message.content, Check.class);
+
+                            if (Long.toString(check.user_id).equals(id)) {
+                                checkList.add(check);
+                                Log.d("MongoDB", "Check found! It's id :" + Long.toString(check.user_id));
+                            }
+                        }
+                    }
+                    callback.onSuccess(checkList);
+                }
+
+                callback.onError(new Exception("Licence not found for user ID: " + id));
+            }
+        }).start();
+    }
+
+    public interface CheckCallback {
+        void onSuccess(ArrayList<Check> checkList);
+        void onError(Exception exception);
+    }
+
+    private void createCheckUIOnMainThread(final String dateTime, final String type, final String description, final double fine, final Context context) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                createCheckUI(dateTime, type, description, fine, context);
+            }
+        });
+    }
+
+    private void removeAllChecksFromView(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((LinearLayout) findViewById(R.id.svH_body)).removeAllViews();
+            }
+        });
     }
 
 
