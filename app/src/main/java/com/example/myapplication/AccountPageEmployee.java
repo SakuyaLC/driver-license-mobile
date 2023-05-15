@@ -26,6 +26,7 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
@@ -43,7 +44,7 @@ import java.util.Hashtable;
 
 import okhttp3.OkHttpClient;
 
-public class AccountPage extends AppCompatActivity {
+public class AccountPageEmployee extends AppCompatActivity {
 
     OkHttpClient client = new OkHttpClient();
 
@@ -58,13 +59,24 @@ public class AccountPage extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_account_page);
+        setContentView(R.layout.activity_account_page_employee);
+
+        ((ImageView) findViewById(R.id.iv_changeToCam)).setImageResource(R.drawable.camera);
+
+        ((ImageView) findViewById(R.id.iv_changeToCam)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent loginIntentAccountPage = new Intent(AccountPageEmployee.this, CameraActivity.class);
+                loginIntentAccountPage.putExtra("Id", id);
+                AccountPageEmployee.this.startActivity(loginIntentAccountPage);
+                AccountPageEmployee.this.finish();
+            }
+        });
 
         Intent loginIntent = getIntent();
 
         id = loginIntent.getStringExtra("Id");
-        role = loginIntent.getStringExtra("Role");
-        role = "1";
+        Log.d("AccountPageIntent", "Got intent with content : " + id);
 
         findBlockByUserIdAsync(id, new LicenceCallback() {
             @Override
@@ -272,8 +284,8 @@ public class AccountPage extends AppCompatActivity {
         LinearLayout ll_body = new LinearLayout(context);
         ll_body.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams layoutParamsBody = new LinearLayout.LayoutParams(
-        (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, 350, getResources().getDisplayMetrics()),
+                (int) TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP, 350, getResources().getDisplayMetrics()),
                 (int) TypedValue.applyDimension(
                         TypedValue.COMPLEX_UNIT_DIP, type.equals("FINE") ? 95 : 70, getResources().getDisplayMetrics()));
         layoutParamsBody.setMargins(0, (int) TypedValue.applyDimension(

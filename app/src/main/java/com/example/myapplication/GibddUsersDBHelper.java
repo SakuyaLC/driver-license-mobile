@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class GibddUsersDBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "gibdd.db";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 9;
 
     public GibddUsersDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -37,6 +37,7 @@ public class GibddUsersDBHelper extends SQLiteOpenHelper {
             user.put("birthDate", "0" + i + ".01.199" + i);
             user.put("birthPlace", "Место рождения # " + i);
             user.put("residence", "Регион проживания #" + i);
+            user.put("role", i%3==0 ? 1 : 0);
 
             db.insert("users", null, user);
         }

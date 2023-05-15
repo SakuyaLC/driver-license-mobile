@@ -32,7 +32,7 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     public int user_id = -1;
-    public String user_name = "", user_surname = "", user_middleName = "", user_email = "", user_password = "";
+    public String user_name = "", user_surname = "", user_middleName = "", user_PsSerial = "", user_PsNumber = "", user_email = "", user_password = "";
     public boolean user_sex = false;
 
     OkHttpClient client = new OkHttpClient();
@@ -94,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
         EditText etReg_Surname = findViewById(R.id.etReg_Surname);
         EditText etReg_MiddleName = findViewById(R.id.etReg_MiddleName);
 
+        EditText etReg_PsSerial = findViewById(R.id.etReg_PsSerial);
+        EditText etReg_PsNumber = findViewById(R.id.etReg_PsNumber);
+
         RadioButton rb_male = findViewById(R.id.rb_male);
         RadioButton rb_female = findViewById(R.id.rb_female);
 
@@ -133,8 +136,14 @@ public class MainActivity extends AppCompatActivity {
                 user_name = etReg_Name.getText().toString().trim();
                 user_surname = etReg_Surname.getText().toString().trim();
                 user_middleName = etReg_MiddleName.getText().toString().trim();
+                user_PsSerial = etReg_PsSerial.getText().toString().trim();
+                user_PsNumber = etReg_PsNumber.getText().toString().trim();
                 user_email = etReg_Email.getText().toString().trim();
-                user_password = etReg_Password.getText().toString().trim();
+                try {
+                    user_password = PasswordEncrypter.encrypt(etReg_Password.getText().toString().trim());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
 
                 //Валидация соблюдена
                 if (!user_name.equals("") && !user_email.equals("") && !user_password.equals("")) {
@@ -152,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
                             user.put("sex", user_sex);
                             user.put("email", user_email);
                             user.put("password", user_password);
+                            user.put("role", getGibddUserRole(Integer.toString(getGibddUserId())));
 
                             long newUserId = appUsersDB.insert("users", null, user);
 
@@ -208,22 +218,33 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 user_email = etLog_Email.getText().toString();
-                user_password = etLog_Password.getText().toString();
+                try {
+                    user_password = PasswordEncrypter.encrypt(etLog_Password.getText().toString().trim());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
 
                 if (userLogin(user_email, user_password)) {
 
-                    Intent loginIntent = new Intent(MainActivity.this, AccountPage.class);
+                    Intent loginIntent;
 
-                    loginIntent.putExtra("Id", getAppUserId(user_email, user_password));
+                    if (getAppUserRole(getAppUserId(user_email,user_password)).equals("0")) {
+                        loginIntent = new Intent(MainActivity.this, AccountPage.class);
+                        loginIntent.putExtra("Id", getAppUserId(user_email, user_password));
+                        loginIntent.putExtra("Role", getAppUserRole(getAppUserId(user_email, user_password)));
+                    } else {
+                        loginIntent = new Intent(MainActivity.this, AccountPageEmployee.class);
+                        loginIntent.putExtra("Id", getAppUserId(user_email, user_password));
+                        loginIntent.putExtra("Role", getAppUserRole(getAppUserId(user_email, user_password)));
+                    }
 
                     appUsersDB.close();
+                    gibddUsersDB.close();
 
                     MainActivity.this.startActivity(loginIntent);
                     MainActivity.this.finish();
 
-                } else
-                    Toast.makeText(MainActivity.this, "Неверный логин или пароль", Toast.LENGTH_SHORT).show();
-
+                } else Toast.makeText(MainActivity.this, "Неверный логин или пароль", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -245,8 +266,8 @@ public class MainActivity extends AppCompatActivity {
         SQLiteDatabase gibddUsersDB = gibddUsersDBHelper.getWritableDatabase();
 
         Cursor cursor = gibddUsersDB.rawQuery(
-                "SELECT * FROM users WHERE name = ? AND surname = ? AND middlename = ? AND sex = ?",
-                new String[]{user_name, user_surname, user_middleName, user_sex == false ? "0" : "1"});
+                "SELECT * FROM users WHERE name = ? AND surname = ? AND middlename = ? AND ps_serial = ? AND ps_number = ? AND sex = ?",
+                new String[]{user_name, user_surname, user_middleName, user_PsSerial, user_PsNumber, user_sex == false ? "0" : "1"});
 
         boolean exists = cursor.moveToFirst(); // вернет true, если запись существует
 
@@ -293,8 +314,8 @@ public class MainActivity extends AppCompatActivity {
         SQLiteDatabase gibddUsersDB = gibddUsersDBHelper.getWritableDatabase();
 
         Cursor cursor = gibddUsersDB.rawQuery("SELECT * FROM users" +
-                        " WHERE name = ? AND surname = ? and middlename = ? AND sex = ?",
-                new String[]{user_name, user_surname, user_middleName, user_sex == false ? "0" : "1"});
+                        " WHERE name = ? AND surname = ? and middlename = ? AND ps_serial = ? AND ps_number = ? AND sex = ?",
+                new String[]{user_name, user_surname, user_middleName, user_PsSerial, user_PsNumber, user_sex == false ? "0" : "1"});
 
         if (cursor.moveToFirst()) {
             // Получаем значение id из первой строки результата
@@ -305,6 +326,31 @@ public class MainActivity extends AppCompatActivity {
         gibddUsersDB.close();
 
         return uId;
+    }
+
+    public String getGibddUserRole(String Id){
+
+        String role = "";
+
+        //Database
+        GibddUsersDBHelper gibddUsersDBHelper = new GibddUsersDBHelper(this);
+        SQLiteDatabase gibddUsersDB = gibddUsersDBHelper.getWritableDatabase();
+
+        Cursor cursor = gibddUsersDB.rawQuery("SELECT * FROM users" +
+                        " WHERE id = ?",
+                new String[]{Id});
+
+        if (cursor.moveToFirst()) {
+            // Получаем значение id из первой строки результата
+            role = cursor.getString(cursor.getColumnIndexOrThrow("role"));
+        }
+
+        cursor.close();
+        gibddUsersDB.close();
+
+        Log.d("App", "Role is : " + role + " " + (role.equals("0") ? "Пользователь" : "Сотрудник"));
+
+        return role;
     }
     public String getAppUserId(String email, String password){
 
@@ -329,6 +375,31 @@ public class MainActivity extends AppCompatActivity {
         Log.d("App", "uId is : " + uId);
 
         return Integer.toString(uId);
+    }
+
+    public String getAppUserRole(String Id){
+
+        String role = "";
+
+        //Database
+        AppUsersDBHelper dbHelper = new AppUsersDBHelper(this);
+        SQLiteDatabase appUsersDB = dbHelper.getWritableDatabase();
+
+        Cursor cursor = appUsersDB.rawQuery("SELECT * FROM users" +
+                        " WHERE id = ?",
+                new String[]{Id});
+
+        if (cursor.moveToFirst()) {
+            // Получаем значение id из первой строки результата
+            role = cursor.getString(cursor.getColumnIndexOrThrow("role"));
+        }
+
+        cursor.close();
+        appUsersDB.close();
+
+        Log.d("App", "Role is : " + role + " " + (role.equals("0") ? "Пользователь" : "Сотрудник"));
+
+        return role;
     }
 
     public void sendGetRequest(String URL, String onFailureMessage, String onSuccessMessage) {
@@ -427,8 +498,9 @@ public class MainActivity extends AppCompatActivity {
                 String sex = cursor.getString(cursor.getColumnIndexOrThrow("sex"));
                 String email = cursor.getString(cursor.getColumnIndexOrThrow("email"));
                 String password = cursor.getString(cursor.getColumnIndexOrThrow("password"));
+                String role = cursor.getString(cursor.getColumnIndexOrThrow("role"));
 
-                Log.d("DatabaseApp", "User #" + id + " | name: " + name + " | surname: " + surname + " | middlename: " + middlename + " | sex: " + sex + " | email: " + email + " | password: " + password);
+                Log.d("DatabaseApp", "User #" + id + " | name: " + name + " | surname: " + surname + " | middlename: " + middlename + " | sex: " + sex + " | email: " + email + " | password: " + password + " | role: " + role);
 
             } while (cursor.moveToNext());
         }
@@ -452,8 +524,9 @@ public class MainActivity extends AppCompatActivity {
                 String surname = cursor.getString(cursor.getColumnIndexOrThrow("surname"));
                 String middlename = cursor.getString(cursor.getColumnIndexOrThrow("middlename"));
                 String sex = cursor.getString(cursor.getColumnIndexOrThrow("sex"));
+                String role = cursor.getString(cursor.getColumnIndexOrThrow("role"));
 
-                Log.d("DatabaseGibdd", "User #" + id + " | name: " + name + " | surname: " + surname + " | middlename: " + middlename + " | sex: " + sex);
+                Log.d("DatabaseGibdd", "User #" + id + " | name: " + name + " | surname: " + surname + " | middlename: " + middlename + " | sex: " + sex + " | role: " + role);
 
             } while (cursor.moveToNext());
         }

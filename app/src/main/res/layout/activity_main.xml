@@ -126,6 +126,73 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/regPassportSerial"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView31"
+                    android:layout_width="10dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:text="Серия паспорта:"
+                    android:textColor="#FFFFFF"
+                    android:textSize="19dp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etReg_PsSerial"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#FFFFFF"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22dp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/regPassportNumber"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView41"
+                    android:layout_width="10dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:text="Номер паспорта:"
+                    android:textColor="#FFFFFF"
+                    android:textSize="19dp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etReg_PsNumber"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="#FFFFFF"
+                    android:ems="10"
+                    android:inputType="textPersonName"
+                    android:textColor="#FFFFFF"
+                    android:textSize="22dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/regSex"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
