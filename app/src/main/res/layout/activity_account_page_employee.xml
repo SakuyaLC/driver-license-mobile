@@ -318,7 +318,7 @@
 
             <Button
                 android:id="@+id/btn_History"
-                android:layout_width="165dp"
+                android:layout_width="160dp"
                 android:layout_height="70dp"
                 android:layout_margin="5dp"
                 android:layout_marginStart="5dp"
@@ -330,19 +330,21 @@
                 android:backgroundTint="#FFFFFF"
                 android:text="История"
                 android:textColor="#000000"
-                android:textSize="24dp"
+                android:textSize="21dp"
                 android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/iv_changeToCam"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_gravity="center"
                 android:layout_weight="1"
+                android:foregroundGravity="center"
                 tools:srcCompat="@drawable/camera" />
 
             <Button
                 android:id="@+id/btn_Profile"
-                android:layout_width="165dp"
+                android:layout_width="160dp"
                 android:layout_height="70dp"
                 android:layout_margin="5dp"
                 android:layout_marginStart="5dp"
@@ -354,7 +356,7 @@
                 android:backgroundTint="#40C4FF"
                 android:text="Профиль"
                 android:textColor="#000000"
-                android:textSize="24dp"
+                android:textSize="21dp"
                 android:textStyle="bold" />
 
         </LinearLayout>

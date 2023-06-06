@@ -216,7 +216,7 @@ public class AccountPageEmployee extends AppCompatActivity {
                 //Подключение к MongoDB
                 MongoClientSettings settings = MongoClientSettings.builder()
                         .applyToClusterSettings(builder ->
-                                builder.hosts(Arrays.asList(new ServerAddress("10.0.2.2", 27017))))
+                                builder.hosts(Arrays.asList(new ServerAddress("192.168.1.33", 27017))))
                         .build();
 
                 MongoClient mongoClient = MongoClients.create(settings);
@@ -431,7 +431,7 @@ public class AccountPageEmployee extends AppCompatActivity {
                 //Подключение к MongoDB
                 MongoClientSettings settings = MongoClientSettings.builder()
                         .applyToClusterSettings(builder ->
-                                builder.hosts(Arrays.asList(new ServerAddress("10.0.2.2", 27017))))
+                                builder.hosts(Arrays.asList(new ServerAddress("192.168.1.33", 27017))))
                         .build();
 
                 MongoClient mongoClient = MongoClients.create(settings);

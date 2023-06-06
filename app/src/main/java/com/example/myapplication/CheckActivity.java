@@ -42,8 +42,8 @@ public class CheckActivity extends AppCompatActivity {
 
     public String surname, middlename, birthDatePlace, dateOfIssue, dateOfExpiration, division, code, residence, categories = " ";
 
-    public final String createBlockURL = "http://10.0.2.2:80/create-block";
-    public final String lotteryURL = "http://10.0.2.2:80/lottery";
+    public final String createBlockURL = "http://192.168.1.33:8080/create-block";
+    public final String lotteryURL = "http://192.168.1.33:8080/lottery";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -306,7 +306,7 @@ public class CheckActivity extends AppCompatActivity {
                 //Подключение к MongoDB
                 MongoClientSettings settings = MongoClientSettings.builder()
                         .applyToClusterSettings(builder ->
-                                builder.hosts(Arrays.asList(new ServerAddress("10.0.2.2", 27017))))
+                                builder.hosts(Arrays.asList(new ServerAddress("192.168.1.33", 27017))))
                         .build();
 
                 MongoClient mongoClient = MongoClients.create(settings);

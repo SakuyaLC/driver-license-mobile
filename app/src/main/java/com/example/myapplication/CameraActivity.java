@@ -22,7 +22,7 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         qrScan = new com.google.zxing.integration.android.IntentIntegrator(this);
-        qrScan.setOrientationLocked(false);
+        qrScan.setOrientationLocked(true);
         qrScan.setPrompt("Наведите камеру на QR-код");
         qrScan.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
         qrScan.setBeepEnabled(false);

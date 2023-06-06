@@ -37,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
 
     OkHttpClient client = new OkHttpClient();
 
-    protected final String сheckURL = "http://10.0.2.2:80";
-    public final String createBlockURL = "http://10.0.2.2:80/create-block";
-    public final String lotteryURL = "http://10.0.2.2:80/lottery";
+    protected final String сheckURL = "http://192.168.1.33:8080";
+    public final String createBlockURL = "http://192.168.1.33:8080/create-block";
+    public final String lotteryURL = "http://192.168.1.33:8080/lottery";
 
 
     @Override
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        checkGetResponse();
+        getSupportActionBar().hide();
 
         //БД Пользователей приложения
         AppUsersDBHelper appUsersDBHelper = new AppUsersDBHelper(this);
@@ -257,6 +257,8 @@ public class MainActivity extends AppCompatActivity {
                 login_layout.setVisibility(View.GONE);
             }
         });
+
+        checkGetResponse();
     }
 
     public boolean licenceExists() {
@@ -605,6 +607,8 @@ public class MainActivity extends AppCompatActivity {
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
+
+                        Log.d("Server", responseString);
 
                         if (responseString.equals("Success")) {
                             toast = Toast.makeText(getApplicationContext(),

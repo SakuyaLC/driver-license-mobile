@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class GibddUsersDBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "gibdd.db";
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 15;
 
     public GibddUsersDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -57,6 +57,62 @@ public class GibddUsersDBHelper extends SQLiteOpenHelper {
 
             db.insert("licences", null, licence);
         }
+
+        ContentValues userV = new ContentValues();
+        userV.put("name", "Вадим");
+        userV.put("surname", "Вагин-Бучин");
+        userV.put("middlename", "Алексеевич");
+        userV.put("sex", false);
+        userV.put("ps_serial", "6315");
+        userV.put("ps_number", "919998");
+        userV.put("birthDate", "26.02.2002");
+        userV.put("birthPlace", "Саратов");
+        userV.put("residence", "Саратовская область");
+        userV.put("role", 0);
+
+        db.insert("users", null, userV);
+
+        ContentValues licenceV = new ContentValues();
+        licenceV.put("user_id", 10);
+        licenceV.put("surname", "Вагин-Бучин");
+        licenceV.put("middlename", "Вадим Алексеевич");
+        licenceV.put("birthDatePlace", "26.02.2002 Саратов");
+        licenceV.put("dateOfIssue", "01.01.2014");
+        licenceV.put("dateOfExpiration", "01.01.2024");
+        licenceV.put("division", "ГИБДД 6273");
+        licenceV.put("code", "61 35 446366");
+        licenceV.put("residence", "Саратовская область");
+        licenceV.put("categories", "B1, CE");
+
+        db.insert("licences", null, licenceV);
+
+        ContentValues userS = new ContentValues();
+        userS.put("name", "Иван");
+        userS.put("surname", "Иванов");
+        userS.put("middlename", "Иванович");
+        userS.put("sex", false);
+        userS.put("ps_serial", "6316");
+        userS.put("ps_number", "919298");
+        userS.put("birthDate", "21.03.2003");
+        userS.put("birthPlace", "Саратов");
+        userS.put("residence", "Саратовская область");
+        userS.put("role", 1);
+
+        db.insert("users", null, userS);
+
+        ContentValues licenceS = new ContentValues();
+        licenceS.put("user_id", 11);
+        licenceS.put("surname", "Иванов");
+        licenceS.put("middlename", "Иван Иванович");
+        licenceS.put("birthDatePlace", "21.03.2003 Саратов");
+        licenceS.put("dateOfIssue", "01.01.2014");
+        licenceS.put("dateOfExpiration", "01.01.2024");
+        licenceS.put("division", "ГИБДД 6413");
+        licenceS.put("code", "61 35 421666");
+        licenceS.put("residence", "Саратовская область");
+        licenceS.put("categories", "B1, CE");
+
+        db.insert("licences", null, licenceS);
 
     }
 
