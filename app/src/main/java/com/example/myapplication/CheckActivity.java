@@ -42,13 +42,16 @@ public class CheckActivity extends AppCompatActivity {
 
     public String surname, middlename, birthDatePlace, dateOfIssue, dateOfExpiration, division, code, residence, categories = " ";
 
-    public final String createBlockURL = "http://192.168.1.33:8080/create-block";
-    public final String lotteryURL = "http://192.168.1.33:8080/lottery";
-
+    protected final String localIP = "192.168.64.246";
+    protected final String baseURL = "http://192.168.64.246:8080";
+    public final String createBlockURL = baseURL+ "/create-block";
+    public final String lotteryURL = baseURL + "/lottery";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check);
+
+        getSupportActionBar().hide();
 
         Intent qrScanIntent = getIntent();
         String id = qrScanIntent.getStringExtra("Result");
@@ -306,7 +309,7 @@ public class CheckActivity extends AppCompatActivity {
                 //Подключение к MongoDB
                 MongoClientSettings settings = MongoClientSettings.builder()
                         .applyToClusterSettings(builder ->
-                                builder.hosts(Arrays.asList(new ServerAddress("192.168.1.33", 27017))))
+                                builder.hosts(Arrays.asList(new ServerAddress(localIP, 27017))))
                         .build();
 
                 MongoClient mongoClient = MongoClients.create(settings);

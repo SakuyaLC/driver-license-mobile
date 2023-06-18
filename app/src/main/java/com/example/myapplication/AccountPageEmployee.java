@@ -53,6 +53,8 @@ public class AccountPageEmployee extends AppCompatActivity {
     //Водительское удостоверение
     public String surname, middlename, birthDatePlace, dateOfIssue, dateOfExpiration, division, code, residence, categories;
 
+    protected final String localIP = "192.168.64.246";
+
     //История проверок, штрафов
     String role = "0";
 
@@ -60,6 +62,8 @@ public class AccountPageEmployee extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_page_employee);
+
+        getSupportActionBar().hide();
 
         ((ImageView) findViewById(R.id.iv_changeToCam)).setImageResource(R.drawable.camera);
 
@@ -157,6 +161,17 @@ public class AccountPageEmployee extends AppCompatActivity {
                 openHistory();
             }
         });
+
+        findViewById(R.id.iv_Logout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent logoutIntent = new Intent(AccountPageEmployee.this, MainActivity.class);
+
+                AccountPageEmployee.this.startActivity(logoutIntent);
+                AccountPageEmployee.this.finish();
+            }
+        });
+
     }
 
     public void formQrCode(String message){
@@ -216,7 +231,7 @@ public class AccountPageEmployee extends AppCompatActivity {
                 //Подключение к MongoDB
                 MongoClientSettings settings = MongoClientSettings.builder()
                         .applyToClusterSettings(builder ->
-                                builder.hosts(Arrays.asList(new ServerAddress("192.168.1.33", 27017))))
+                                builder.hosts(Arrays.asList(new ServerAddress(localIP, 27017))))
                         .build();
 
                 MongoClient mongoClient = MongoClients.create(settings);
@@ -431,7 +446,7 @@ public class AccountPageEmployee extends AppCompatActivity {
                 //Подключение к MongoDB
                 MongoClientSettings settings = MongoClientSettings.builder()
                         .applyToClusterSettings(builder ->
-                                builder.hosts(Arrays.asList(new ServerAddress("192.168.1.33", 27017))))
+                                builder.hosts(Arrays.asList(new ServerAddress(localIP, 27017))))
                         .build();
 
                 MongoClient mongoClient = MongoClients.create(settings);

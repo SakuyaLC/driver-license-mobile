@@ -21,6 +21,8 @@ public class CameraActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getSupportActionBar().hide();
+
         qrScan = new com.google.zxing.integration.android.IntentIntegrator(this);
         qrScan.setOrientationLocked(true);
         qrScan.setPrompt("Наведите камеру на QR-код");
@@ -40,6 +42,12 @@ public class CameraActivity extends AppCompatActivity {
             if (result.getContents() == null) {
                 // QR-код не найден
                 Toast.makeText(this, "Сканирование отменено", Toast.LENGTH_LONG).show();
+                Intent loginIntentAccountPage = getIntent();
+                Intent loginIntentCamera = new Intent(CameraActivity.this, AccountPageEmployee.class);
+                loginIntentCamera.putExtra("Id", loginIntentAccountPage.getStringExtra("Id"));
+
+                CameraActivity.this.startActivity(loginIntentCamera);
+                CameraActivity.this.finish();
             } else {
                 // QR-код найден
                 String qrCode = result.getContents();
@@ -64,5 +72,15 @@ public class CameraActivity extends AppCompatActivity {
             CameraActivity.this.startActivity(loginIntentCamera);
             CameraActivity.this.finish();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent loginIntentAccountPage = getIntent();
+        Intent loginIntentCamera = new Intent(CameraActivity.this, AccountPageEmployee.class);
+        loginIntentCamera.putExtra("Id", loginIntentAccountPage.getStringExtra("Id"));
+
+        CameraActivity.this.startActivity(loginIntentCamera);
+        CameraActivity.this.finish();
     }
 }

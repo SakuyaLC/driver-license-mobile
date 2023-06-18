@@ -24,7 +24,7 @@
             android:layout_height="match_parent"
             android:gravity="top"
             android:orientation="vertical"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <LinearLayout
                 android:id="@+id/regName"
@@ -52,11 +52,11 @@
                     android:layout_marginRight="10dp"
                     android:layout_weight="1"
                     android:backgroundTint="#FFFFFF"
+                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ-"
                     android:ems="10"
                     android:inputType="textPersonName"
                     android:textColor="#FFFFFF"
                     android:textSize="22dp"
-                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ-"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -70,7 +70,7 @@
 
                 <TextView
                     android:id="@+id/textView8"
-                    android:layout_width="50dp"
+                    android:layout_width="70dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
@@ -86,11 +86,11 @@
                     android:layout_marginRight="10dp"
                     android:layout_weight="1"
                     android:backgroundTint="#FFFFFF"
+                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ-"
                     android:ems="10"
                     android:inputType="textPersonName"
                     android:textColor="#FFFFFF"
                     android:textSize="22dp"
-                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ-"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -104,7 +104,7 @@
 
                 <TextView
                     android:id="@+id/textView11"
-                    android:layout_width="50dp"
+                    android:layout_width="70dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
@@ -120,11 +120,11 @@
                     android:layout_marginRight="10dp"
                     android:layout_weight="1"
                     android:backgroundTint="#FFFFFF"
+                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ-"
                     android:ems="10"
                     android:inputType="textPersonName"
                     android:textColor="#FFFFFF"
                     android:textSize="22dp"
-                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ-"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -154,11 +154,11 @@
                     android:layout_marginRight="10dp"
                     android:layout_weight="1"
                     android:backgroundTint="#FFFFFF"
+                    android:digits="0123456789"
                     android:ems="10"
                     android:inputType="textPersonName"
                     android:textColor="#FFFFFF"
                     android:textSize="22dp"
-                    android:digits="0123456789"
                     android:textStyle="bold" />
 
             </LinearLayout>
@@ -189,13 +189,12 @@
                     android:layout_marginRight="10dp"
                     android:layout_weight="1"
                     android:backgroundTint="#FFFFFF"
+                    android:digits="0123456789"
                     android:ems="10"
                     android:inputType="textPersonName"
                     android:textColor="#FFFFFF"
                     android:textSize="22dp"
-                    android:textStyle="bold"
-                    android:digits="0123456789"
-                    />
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -277,8 +276,8 @@
                     android:layout_weight="1"
                     android:backgroundTint="#FFFFFF"
                     android:ems="10"
-                    android:inputType="textEmailAddress"
                     android:hint="Введите адрес электронной почты"
+                    android:inputType="textEmailAddress"
                     android:textColor="#FFFFFF"
                     android:textSize="19dp"
                     android:textStyle="bold" />
@@ -356,7 +355,7 @@
             android:layout_height="match_parent"
             android:gravity="top"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <LinearLayout
                 android:id="@+id/logEmail"
@@ -367,7 +366,7 @@
 
                 <TextView
                     android:id="@+id/textView5"
-                    android:layout_width="50dp"
+                    android:layout_width="60dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"
@@ -398,7 +397,7 @@
 
                 <TextView
                     android:id="@+id/textView6"
-                    android:layout_width="50dp"
+                    android:layout_width="60dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:layout_weight="1"

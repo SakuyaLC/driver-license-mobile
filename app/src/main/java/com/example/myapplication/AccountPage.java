@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.accounts.Account;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,12 +14,14 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
@@ -52,6 +55,8 @@ public class AccountPage extends AppCompatActivity {
     //Водительское удостоверение
     public String surname, middlename, birthDatePlace, dateOfIssue, dateOfExpiration, division, code, residence, categories;
 
+    protected final String localIP = "192.168.64.246";
+
     //История проверок, штрафов
     String role = "0";
 
@@ -60,7 +65,10 @@ public class AccountPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_page);
 
-        getSupportActionBar().hide();
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(new View(this)); // Пустое пользовательское представление
+        getSupportActionBar().setDisplayShowCustomEnabled(false); // Отключение пользовательского представления
+        getSupportActionBar().hide(); // Скрытие панели действий
 
         Intent loginIntent = getIntent();
 
@@ -146,6 +154,16 @@ public class AccountPage extends AppCompatActivity {
                 openHistory();
             }
         });
+
+        findViewById(R.id.iv_Logout).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent logoutIntent = new Intent(AccountPage.this, MainActivity.class);
+
+                AccountPage.this.startActivity(logoutIntent);
+                AccountPage.this.finish();
+            }
+        });
     }
 
     public void formQrCode(String message){
@@ -205,7 +223,7 @@ public class AccountPage extends AppCompatActivity {
                 //Подключение к MongoDB
                 MongoClientSettings settings = MongoClientSettings.builder()
                         .applyToClusterSettings(builder ->
-                                builder.hosts(Arrays.asList(new ServerAddress("192.168.1.33", 27017))))
+                                builder.hosts(Arrays.asList(new ServerAddress(localIP, 27017))))
                         .build();
 
                 MongoClient mongoClient = MongoClients.create(settings);
@@ -420,7 +438,7 @@ public class AccountPage extends AppCompatActivity {
                 //Подключение к MongoDB
                 MongoClientSettings settings = MongoClientSettings.builder()
                         .applyToClusterSettings(builder ->
-                                builder.hosts(Arrays.asList(new ServerAddress("192.168.1.33", 27017))))
+                                builder.hosts(Arrays.asList(new ServerAddress(localIP, 27017))))
                         .build();
 
                 MongoClient mongoClient = MongoClients.create(settings);
