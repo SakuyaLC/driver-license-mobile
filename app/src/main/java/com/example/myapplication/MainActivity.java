@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     OkHttpClient client = new OkHttpClient();
 
-    protected final String baseURL = "http://192.168.64.246:8080";
+    protected final String baseURL = "http://192.168.1.33:8080";
     protected final String сheckURL = baseURL;
     public final String createBlockURL = baseURL + "/create-block";
     public final String lotteryURL = baseURL + "/lottery";

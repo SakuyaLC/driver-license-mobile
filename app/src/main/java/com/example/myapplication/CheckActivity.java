@@ -42,8 +42,8 @@ public class CheckActivity extends AppCompatActivity {
 
     public String surname, middlename, birthDatePlace, dateOfIssue, dateOfExpiration, division, code, residence, categories = " ";
 
-    protected final String localIP = "192.168.64.246";
-    protected final String baseURL = "http://192.168.64.246:8080";
+    protected final String localIP = "192.168.1.33";
+    protected final String baseURL = "http://192.168.1.33:8080";
     public final String createBlockURL = baseURL+ "/create-block";
     public final String lotteryURL = baseURL + "/lottery";
     @Override

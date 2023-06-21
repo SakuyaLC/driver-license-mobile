@@ -276,7 +276,6 @@
                     android:layout_weight="1"
                     android:backgroundTint="#FFFFFF"
                     android:ems="10"
-                    android:hint="Введите адрес электронной почты"
                     android:inputType="textEmailAddress"
                     android:textColor="#FFFFFF"
                     android:textSize="19dp"

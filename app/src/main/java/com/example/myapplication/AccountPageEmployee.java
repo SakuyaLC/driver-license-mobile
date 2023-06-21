@@ -53,7 +53,7 @@ public class AccountPageEmployee extends AppCompatActivity {
     //Водительское удостоверение
     public String surname, middlename, birthDatePlace, dateOfIssue, dateOfExpiration, division, code, residence, categories;
 
-    protected final String localIP = "192.168.64.246";
+    protected final String localIP = "192.168.1.33";
 
     //История проверок, штрафов
     String role = "0";
